@@ -133,6 +133,7 @@ canvas#sig{width:100%;height:120px;border:1.5px dashed var(--line);border-radius
 <div class="wrap hide" id="tab-receive">
   <div class="card">
     <b>Receive handover / हैंडओवर लें</b>
+    <div id="scanStatus" class="note" style="margin:4px 0;padding:6px 8px;border-radius:6px;background:#f4f7fb">Checking scanner…</div>
     <p class="note">Scan previous supervisor's QR to load stock, tasks &amp; notes.</p>
     <button class="btn" id="startScan">📷 Scan with live camera</button>
     <video id="scanvid" class="hide" playsinline></video>
@@ -436,6 +437,7 @@ function switchTab(name){
   if(name==="stock")buildStock($("#filter").value);
   if(name==="close"){buildCloseSummary();setTimeout(initSig,50);}
   if(name==="report")buildReport();
+  if(name==="receive")updateScanStatus();
   if(name!=="receive")stopScan();
   autoBackup();
 }
@@ -446,7 +448,13 @@ try{const usp=new URLSearchParams(location.search||"");if(usp.get("site")&&SITES
 function updNet(){$("#offlineBanner").classList.toggle("hide",navigator.onLine);}
 window.addEventListener("online",updNet);window.addEventListener("offline",updNet);
 
-function initAll(){try{refreshCarry();updateShiftCard();updNet();}catch(e){console.error(e);}}
+function updateScanStatus(){
+  var el=document.getElementById('scanStatus');if(!el)return;
+  var fn=window.getScanner&&window.getScanner();
+  if(typeof fn==='function'){el.innerHTML='✅ Scanner ready';el.style.background='#e7f6ee';el.style.color='#1e7a44';}
+  else{el.innerHTML='⏳ Scanner library not detected. If this persists: hard-refresh (clear cache) or use the photo option below.';el.style.background='#fff8e6';el.style.color='#8a6d1a';}
+}
+function initAll(){try{refreshCarry();updateShiftCard();updNet();updateScanStatus();}catch(e){console.error(e);}}
 initAll();
 if('serviceWorker' in navigator && location.protocol==='https:'){navigator.serviceWorker.register('sw.js').catch(()=>{});}
 </script>
